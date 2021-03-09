@@ -1,135 +1,58 @@
 package m2.miage.m2gestionmembres.entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import m2.miage.m2gestionmembres.enums.EnumEtatUtilisateur;
 import m2.miage.m2gestionmembres.enums.EnumTypeUtilisateur;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
+@SuperBuilder
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Table(name = "membre")
 public class Membre {
 
     @Id
-    private String pseudo;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "membre_generator", sequenceName = "membre_seq", allocationSize = 1)
+    private Integer id;
 
+    @Column(name = "nom")
     private String nom;
 
+    @Column(name = "prenom")
     private String prenom;
 
+    @Column(name = "mail")
     private String mail;
 
+    @Column(name = "mdp")
     private String mdp;
 
+    @Column(name = "pseudo")
     private String adresse;
 
-    private Date dateCertif;
+    @Column(name = "dateCertif")
+    private LocalDateTime dateCertif;
 
+    @Column(name = "niveau")
     private Integer niveau;
 
-    private Integer numLicence;
+    @Column(name = "numLicence")
+    private String numLicence;
 
-    private EnumTypeUtilisateur type;
+    @Column(name = "type")
+    private String type;
 
-    private EnumEtatUtilisateur etat;
-
-    public Membre(String pseudo, String nom, String mdp){
-        this.pseudo=pseudo;
-        this.nom=nom;
-        this.mdp=mdp;
-        this.type = EnumTypeUtilisateur.MEMBRE;
-        this.etat= EnumEtatUtilisateur.EN_RETARD_DE_PAIEMENT;
-    }
-
-    public Membre() {
-
-    }
-
-    public String getPseudo() {
-        return pseudo;
-    }
-
-    public void setPseudo(String pseudo) {
-        this.pseudo = pseudo;
-    }
-
-    public String getNom() {
-        return nom;
-    }
-
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
-
-    public String getPrenom() {
-        return prenom;
-    }
-
-    public void setPrenom(String prenom) {
-        this.prenom = prenom;
-    }
-
-    public String getMail() {
-        return mail;
-    }
-
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
-
-    public String getMdp() {
-        return mdp;
-    }
-
-    public void setMdp(String mdp) {
-        this.mdp = mdp;
-    }
-
-    public String getAdresse() {
-        return adresse;
-    }
-
-    public void setAdresse(String adresse) {
-        this.adresse = adresse;
-    }
-
-    public Date getDateCertif() {
-        return dateCertif;
-    }
-
-    public void setDateCertif(Date dateCertif) {
-        this.dateCertif = dateCertif;
-    }
-
-    public Integer getNiveau() {
-        return niveau;
-    }
-
-    public void setNiveau(Integer niveau) {
-        this.niveau = niveau;
-    }
-
-    public Integer getNumLicence() {
-        return numLicence;
-    }
-
-    public void setNumLicence(Integer numLicence) {
-        this.numLicence = numLicence;
-    }
-
-    public EnumTypeUtilisateur getType() {
-        return type;
-    }
-
-    public void setType(EnumTypeUtilisateur type) {
-        this.type = type;
-    }
-
-    public EnumEtatUtilisateur getEtat() {
-        return etat;
-    }
-
-    public void setEtat(EnumEtatUtilisateur etat) {
-        this.etat = etat;
-    }
+    @Column(name = "etat")
+    private String etat;
 }
