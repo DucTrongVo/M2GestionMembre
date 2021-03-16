@@ -1,33 +1,61 @@
 package m2.miage.m2gestionmembres.controllers;
 
+import javassist.NotFoundException;
+import m2.miage.m2gestionmembres.Exception.ForbiddenException;
 import m2.miage.m2gestionmembres.entities.Membre;
-import m2.miage.m2gestionmembres.services.MembreServiceImpl;
+import m2.miage.m2gestionmembres.services.MembreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
-@RequestMapping(value = "/membres")
+@RequestMapping( "/membres")
 public class MembreController {
     private static final Logger logger = LoggerFactory.getLogger(MembreController.class);
 
     @Autowired
-    private MembreServiceImpl membreServiceImpl;
+    private MembreService membreService;
 
-    @GetMapping(value = "/")
-    public ResponseEntity<Membre> ouvrirUnNouveauCompte(){
+    @GetMapping(value = "/allMembre")
+    private ResponseEntity<?> getAllMembre(@RequestParam("emailRequester") String emailRequester) {
         try{
-            return ResponseEntity.ok(membreServiceImpl.creerUnMembre());
+            return new ResponseEntity<>(membreService.getAllMembre(emailRequester), HttpStatus.OK);
+        }  catch (NotFoundException e){
+            return new ResponseEntity<>("Membre d'email "+emailRequester+" introuvable!", HttpStatus.FORBIDDEN);
+        } catch (ForbiddenException e){
+            return new ResponseEntity<>("Utilisateur d'email "+emailRequester+" ne possède pas le droit pour cette action!", HttpStatus.FORBIDDEN);
+        } catch (Exception e){
+            logger.error("Erreur ",e);
+            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(value = "/{email}")
+    private ResponseEntity<?> getMebreByEmail(@PathVariable("email") String email) {
+        try{
+            return new ResponseEntity<>(membreService.getMembreByEmail(email), HttpStatus.OK);
+        } catch (NotFoundException e){
+            return new ResponseEntity<>("Membre d'email "+email+" introuvable!", HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e){
+            logger.error("Erreur ",e);
+            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping(value = "/")
+    public ResponseEntity<?> creerMembre(@RequestBody Membre membre){
+        try{
+            return ResponseEntity.ok(membreService.creerMembre(membre));
         }catch (Exception e){
             logger.error("Erreur ",e);
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

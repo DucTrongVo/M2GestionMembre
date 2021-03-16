@@ -5,12 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import m2.miage.m2gestionmembres.enums.EnumEtatUtilisateur;
-import m2.miage.m2gestionmembres.enums.EnumTypeUtilisateur;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @SuperBuilder
 @Entity
@@ -38,7 +35,7 @@ public class Membre {
     @Column(name = "mdp")
     private String mdp;
 
-    @Column(name = "pseudo")
+    @Column(name = "adresse")
     private String adresse;
 
     @Column(name = "dateCertif")
