@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,6 +56,38 @@ public class MembreServiceImpl implements MembreService{
         } else {
             logger.warn("Utilisateur d'email {} ne possède pas le droit pour cette action!", emailRequester);
             throw new ForbiddenException("Utilisateur d'email "+emailRequester+" ne possède pas le droit pour cette action!");
+        }
+    }
+
+    @Override
+    public Membre mettreAJourMembre(String emailRequester, String email, Membre membreAJour) throws NotFoundException, ForbiddenException {
+        Membre requester = getMembreByEmail(emailRequester);
+        if (!requester.getType().equals(EnumTypeUtilisateur.SECRETAIRE.name())) {
+            logger.warn("Utilisateur d'email {} ne possède pas le droit pour cette action!", emailRequester);
+            throw new ForbiddenException("Utilisateur d'email " + emailRequester + " ne possède pas le droit pour cette action!");
+        }
+        else{
+            Optional<Membre> ancienMembre = membreRepo.findMembreByMail(email);
+            if (!StringUtils.isBlank(membreAJour.getEtat())) {
+                ancienMembre.get().setEtat(membreAJour.getEtat());
+            }
+            if (!StringUtils.isBlank(membreAJour.getType())) {
+                ancienMembre.get().setType(membreAJour.getType());
+            }
+            if (!StringUtils.isBlank(membreAJour.getNumLicence())) {
+                ancienMembre.get().setNumLicence(membreAJour.getNumLicence());
+            }
+            if (membreAJour.getNiveau() != null) {
+                ancienMembre.get().setNiveau(membreAJour.getNiveau());
+            }
+
+            if (membreAJour.getDateCertif() != null) {
+                String dateFormat = "dd-yMM-yyyy HH:mm:ss";
+                //LocalDateTime dateString = membreAJour.getDateCertif().format(DateTimeFormatter.ofPattern(dateFormat));
+
+                ancienMembre.get().setDateCertif(membreAJour.getDateCertif());
+            }
+            return membreRepo.save(ancienMembre.get());
         }
     }
 

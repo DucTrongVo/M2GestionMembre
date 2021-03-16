@@ -1,13 +1,17 @@
 package m2.miage.m2gestionmembres.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Calendar;
 
 @SuperBuilder
 @Entity
@@ -39,7 +43,9 @@ public class Membre {
     private String adresse;
 
     @Column(name = "dateCertif")
-    private LocalDateTime dateCertif;
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss", timezone = "UTC")
+    private Calendar dateCertif;
 
     @Column(name = "niveau")
     private Integer niveau;

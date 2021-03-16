@@ -11,4 +11,5 @@ public interface MembreService {
     Membre creerMembre(Membre membre);
     Membre getMembreByEmail(String email) throws NotFoundException;
     List<Membre> getAllMembre(String emailRequester) throws NotFoundException, ForbiddenException;
+    Membre mettreAJourMembre(String emailRequester, String email, Membre membreAJour) throws NotFoundException, ForbiddenException;
 }

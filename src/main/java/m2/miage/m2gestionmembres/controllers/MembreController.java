@@ -58,4 +58,17 @@ public class MembreController {
             return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PostMapping(value = "/maj/{email}")
+    public ResponseEntity<?> mettreAJourMembre(@RequestParam("emailRequester") String emailRequester, @PathVariable("email") String email, @RequestBody Membre membre){
+        try{
+            return ResponseEntity.ok(membreService.mettreAJourMembre(emailRequester, email, membre));
+        }catch (ForbiddenException e){
+            return new ResponseEntity<>("Utilisateur d'email "+emailRequester+" ne possède pas le droit pour cette action!", HttpStatus.FORBIDDEN);
+        }
+        catch (Exception e){
+            logger.error("Erreur ",e);
+            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
