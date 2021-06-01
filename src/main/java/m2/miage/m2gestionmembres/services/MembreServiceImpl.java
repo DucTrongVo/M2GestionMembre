@@ -15,8 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class MembreServiceImpl implements MembreService{
@@ -115,7 +114,22 @@ public class MembreServiceImpl implements MembreService{
         }
     }
 
-
+    @Override
+    public Boolean isMembreApte(String emailMembre) throws NotFoundException {
+        Optional<Membre> membre = membreRepo.findMembreByMail(emailMembre);
+        if(membre.isEmpty()){
+            throw new NotFoundException("L'email "+emailMembre+"  n'existe pas");
+        }
+        Calendar calendar = membre.get().getDateCertif();
+        Date dateCertif = calendar.getTime();
+        Date today = new Date();
+        long difference = today.getTime() - dateCertif.getTime();
+        float nbJours = (difference/ (1000*60*60*24));
+        if(nbJours<365){
+            return true;
+        }
+        return false;
+    }
 
 
 }

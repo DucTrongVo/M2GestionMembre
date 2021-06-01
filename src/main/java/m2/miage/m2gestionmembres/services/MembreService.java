@@ -12,5 +12,6 @@ public interface MembreService {
     Membre getMembreByEmail(String email) throws NotFoundException;
     List<Membre> getAllMembre(String emailRequester) throws NotFoundException, ForbiddenException;
     Membre mettreAJourMembre(String emailRequester, String email, Membre membreAJour) throws NotFoundException, ForbiddenException;
-    Boolean supprimerMembre(String emailRequester, String idMembre) throws NotFoundException, ForbiddenException;
+    Boolean supprimerMembre(String emailRequester, String emailMembre) throws NotFoundException, ForbiddenException;
+    Boolean isMembreApte(String emailMembre) throws NotFoundException;
 }

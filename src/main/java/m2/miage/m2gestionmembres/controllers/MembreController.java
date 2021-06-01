@@ -90,4 +90,20 @@ public class MembreController {
             return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping(value = "/isApte/{email}")
+    private ResponseEntity<?> isMembreApte(@PathVariable("email") String email) {
+        try{
+            if(membreService.isMembreApte(email)){
+                return new ResponseEntity<>("Le membre est bien apte ! :)", HttpStatus.OK);
+            }
+            return new ResponseEntity<>("Le membre est non apte. :(", HttpStatus.OK);
+        } catch (NotFoundException e){
+            return new ResponseEntity<>("Membre d'email "+email+" introuvable!", HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e){
+            logger.error("Erreur ",e);
+            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
