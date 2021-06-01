@@ -12,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Controller
 @RequestMapping( "/membres")
 public class MembreController {
@@ -41,7 +39,8 @@ public class MembreController {
         try{
             return new ResponseEntity<>(membreService.getMembreByEmail(email), HttpStatus.OK);
         } catch (NotFoundException e){
-            return new ResponseEntity<>("Membre d'email "+email+" introuvable!", HttpStatus.NOT_FOUND);
+            //return new ResponseEntity<>("Membre d'email "+email+" introuvable!", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
         catch (Exception e){
             logger.error("Erreur ",e);

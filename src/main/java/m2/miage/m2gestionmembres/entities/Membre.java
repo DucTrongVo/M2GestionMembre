@@ -6,11 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.io.Serializable;
 import java.util.Calendar;
 
 @SuperBuilder
@@ -20,7 +18,9 @@ import java.util.Calendar;
 @Getter
 @Setter
 @Table(name = "membre")
-public class Membre {
+public class Membre implements Serializable {
+
+    private static final long serialVersionUID = -7499754709735547940L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
