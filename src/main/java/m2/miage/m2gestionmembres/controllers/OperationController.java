@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping( "/paiement")
 public class OperationController {
@@ -22,7 +24,7 @@ public class OperationController {
     private OperationService operationService;
 
     @GetMapping("/getAll")
-    ResponseEntity<?> getAllOperation(@RequestParam("emailSec") String emailSec) throws NotFoundException, ForbiddenException {
+    ResponseEntity<List<Operation>> getAllOperation(@RequestParam("emailSec") String emailSec) throws NotFoundException, ForbiddenException, GeneralErreurException {
         try {
             return new ResponseEntity<>(operationService.getAllOperation(emailSec), HttpStatus.OK);
         } catch (NotFoundException exception) {
@@ -31,7 +33,7 @@ public class OperationController {
             throw new ForbiddenException(e.getMessage());
         } catch (Exception e){
             logger.error("Erreur ",e);
-            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GeneralErreurException();
         }
     }
 
@@ -51,7 +53,7 @@ public class OperationController {
     }*/
 
     @PostMapping("/validatePayment/{idPayment}")
-    ResponseEntity<?> validatePayment(@RequestParam("emailSec") String emailSec, @PathVariable("idPayment") String idOperation) throws NotFoundException, ForbiddenException {
+    ResponseEntity<Operation> validatePayment(@RequestParam("emailSec") String emailSec, @PathVariable("idPayment") String idOperation) throws NotFoundException, ForbiddenException, GeneralErreurException {
         try {
             Integer idOp = Integer.parseInt(idOperation);
             return new ResponseEntity<>(operationService.validatePaiement(emailSec, idOp), HttpStatus.OK);
@@ -61,12 +63,12 @@ public class OperationController {
             throw new ForbiddenException(exception.getMessage());
         } catch (Exception e){
             logger.error("Erreur ",e);
-            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GeneralErreurException();
         }
     }
 
     @PostMapping("/refusePayment/{idPayment}")
-    ResponseEntity<?> refusePayment(@RequestParam("emailSec") String emailSec, @PathVariable("idPayment") String idOperation) throws NotFoundException, ForbiddenException {
+    ResponseEntity<Operation> refusePayment(@RequestParam("emailSec") String emailSec, @PathVariable("idPayment") String idOperation) throws NotFoundException, ForbiddenException, GeneralErreurException {
         try {
             Integer idOp = Integer.parseInt(idOperation);
             return new ResponseEntity<>(operationService.refusePaiement(emailSec, idOp), HttpStatus.OK);
@@ -76,7 +78,7 @@ public class OperationController {
             throw new ForbiddenException(exception.getMessage());
         } catch (Exception e){
             logger.error("Erreur ",e);
-            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GeneralErreurException();
         }
     }
 }
