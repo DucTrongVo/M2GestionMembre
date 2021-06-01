@@ -78,8 +78,9 @@ public class OperationServiceImpl implements OperationService{
         }
         if (rightService.checkRight(membre.get(), EnumTypeUtilisateur.SECRETAIRE.name())){
             operation.setStatus(EnumEtatPaiement.ACCEPTED.name());
-            membre.get().setEtat(EnumEtatUtilisateur.REGLE.name());
-            membreRepo.save(membre.get());
+            Membre memberToUpdate = operation.getMembre();
+            memberToUpdate.setEtat(EnumEtatUtilisateur.REGLE.name());
+            membreRepo.save(memberToUpdate);
             return operationRepository.save(operation);
         } else {
             logger.warn("Utilisateur d'email {} ne possède pas le droit pour cette action!", emailSec);
