@@ -2,8 +2,11 @@ package m2.miage.m2gestionmembres.controllers;
 
 import javassist.NotFoundException;
 import m2.miage.m2gestionmembres.Exception.ForbiddenException;
+import m2.miage.m2gestionmembres.Exception.GeneralErreurException;
 import m2.miage.m2gestionmembres.entities.Membre;
+import m2.miage.m2gestionmembres.entities.Operation;
 import m2.miage.m2gestionmembres.services.MembreService;
+import m2.miage.m2gestionmembres.services.OperationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,72 +25,91 @@ public class MembreController {
     @Autowired
     private MembreService membreService;
 
+    @Autowired
+    private OperationService operationService;
+
     @GetMapping(value = "/allMembre")
-    private ResponseEntity<?> getAllMembre(@RequestParam("emailRequester") String emailRequester) {
+    private ResponseEntity<List<Membre>> getAllMembre(@RequestParam("emailRequester") String emailRequester) throws ForbiddenException, NotFoundException, GeneralErreurException {
         try{
             return new ResponseEntity<>(membreService.getAllMembre(emailRequester), HttpStatus.OK);
         }  catch (NotFoundException e){
-            return new ResponseEntity<>("Membre d'email "+emailRequester+" introuvable!", HttpStatus.FORBIDDEN);
+            throw new NotFoundException(e.getMessage());
         } catch (ForbiddenException e){
-            return new ResponseEntity<>("Utilisateur d'email "+emailRequester+" ne possède pas le droit pour cette action!", HttpStatus.FORBIDDEN);
+            throw new ForbiddenException(e.getMessage());
         } catch (Exception e){
             logger.error("Erreur ",e);
-            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GeneralErreurException();
         }
     }
 
     @GetMapping(value = "/{email}")
-    private ResponseEntity<?> getMembreByEmail(@PathVariable("email") String email) {
+    private ResponseEntity<Membre> getMembreByEmail(@PathVariable("email") String email) throws NotFoundException, GeneralErreurException {
         try{
             return new ResponseEntity<>(membreService.getMembreByEmail(email), HttpStatus.OK);
         } catch (NotFoundException e){
-            return new ResponseEntity<>("Membre d'email "+email+" introuvable!", HttpStatus.NOT_FOUND);
+            //return new ResponseEntity<>("Membre d'email "+email+" introuvable!", HttpStatus.NOT_FOUND);
+            throw new NotFoundException(e.getMessage());
         }
         catch (Exception e){
             logger.error("Erreur ",e);
-            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GeneralErreurException();
         }
     }
 
     @PostMapping(value = "/")
-    public ResponseEntity<?> creerMembre(@RequestBody Membre membre){
+    public ResponseEntity<Membre> creerMembre(@RequestBody Membre membre) throws GeneralErreurException, ForbiddenException {
         try{
             return ResponseEntity.ok(membreService.creerMembre(membre));
         }catch (ForbiddenException e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+            throw new ForbiddenException(e.getMessage());
         }
         catch (Exception e){
             logger.error("Erreur ",e);
-            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GeneralErreurException();
         }
     }
 
     @PostMapping(value = "/maj/{email}")
-    public ResponseEntity<?> mettreAJourMembre(@RequestParam("emailRequester") String emailRequester, @PathVariable("email") String email, @RequestBody Membre membre){
+    public ResponseEntity<Membre> mettreAJourMembre(@RequestParam("emailRequester") String emailRequester, @PathVariable("email") String email, @RequestBody Membre membre) throws GeneralErreurException, ForbiddenException {
         try{
             return ResponseEntity.ok(membreService.mettreAJourMembre(emailRequester, email, membre));
         }catch (ForbiddenException e){
-            return new ResponseEntity<>("Utilisateur d'email "+emailRequester+" ne possède pas le droit pour cette action!", HttpStatus.FORBIDDEN);
+            throw new ForbiddenException(e.getMessage());
         }
         catch (Exception e){
             logger.error("Erreur ",e);
-            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GeneralErreurException();
+        }
+    }
+
+    @PostMapping("/member/pay")
+    ResponseEntity<Operation> paiement(@RequestParam("emailMembre")String emailMembre, @RequestParam("iban") String iban, @RequestParam("montant") String montant) throws NotFoundException, ForbiddenException, GeneralErreurException {
+        try {
+            double montantInDouble = Double.parseDouble(montant);
+            return new ResponseEntity<>(operationService.paiement(emailMembre, iban, montantInDouble), HttpStatus.OK);
+        } catch (NotFoundException exception) {
+            throw new NotFoundException(exception.getMessage());
+        } catch (ForbiddenException exception) {
+            throw new ForbiddenException(exception.getMessage());
+        } catch (Exception e){
+            logger.error("Erreur ",e);
+            throw new GeneralErreurException();
         }
     }
 
     @DeleteMapping(value = "/delete/{email}")
-    public ResponseEntity<?> supprimerUnMembre(@RequestParam("emailRequester") String emailRequester, @PathVariable("email") String email){
+    public ResponseEntity<String> supprimerUnMembre(@RequestParam("emailRequester") String emailRequester, @PathVariable("email") String email) throws ForbiddenException, GeneralErreurException {
         try{
             if(membreService.supprimerMembre(emailRequester, email)){
                 return ResponseEntity.ok("Supression réussie !");
             }
-            return new ResponseEntity<>("Une erreur est survenue lors de la suppression.",HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GeneralErreurException();
         }catch (ForbiddenException e){
-            return new ResponseEntity<>("Utilisateur d'email "+emailRequester+" ne possède pas le droit pour cette action!", HttpStatus.FORBIDDEN);
+            throw new ForbiddenException("Utilisateur d'email \"+emailRequester+\" ne possède pas le droit pour cette action!");
         }
         catch (Exception e){
             logger.error("Erreur ",e);
-            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GeneralErreurException();
         }
     }
 }
