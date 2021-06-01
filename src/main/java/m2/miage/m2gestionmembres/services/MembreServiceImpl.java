@@ -26,14 +26,21 @@ public class MembreServiceImpl implements MembreService{
     @Autowired
     private MembreRepo membreRepo;
 
-    public Membre creerMembre(Membre membre) {
-        Membre newMembre  = Membre.builder().nom(membre.getNom()).prenom(membre.getPrenom())
-                        .mail(membre.getMail()).mdp(membre.getMdp()).adresse(membre.getAdresse())
-                        .type(StringUtils.isBlank(membre.getType()) ? EnumTypeUtilisateur.MEMBRE.name() : membre.getType())
-                        .etat(EnumEtatUtilisateur.RETARD.name())
-                        .build();
-        membreRepo.save(newMembre);
-        return membre;
+    public Membre creerMembre(Membre membre) throws NotFoundException, ForbiddenException {
+        String email = membre.getMail();
+        Optional<Membre> membreEnBase = membreRepo.findMembreByMail(email);
+        if(!membreEnBase.isEmpty()){
+            throw new ForbiddenException("Création impossible : l'email "+email+" est déja utilisé.");
+        }
+        else {
+            Membre newMembre = Membre.builder().nom(membre.getNom()).prenom(membre.getPrenom())
+                    .mail(membre.getMail()).mdp(membre.getMdp()).adresse(membre.getAdresse())
+                    .type(StringUtils.isBlank(membre.getType()) ? EnumTypeUtilisateur.MEMBRE.name() : membre.getType())
+                    .etat(EnumEtatUtilisateur.RETARD.name())
+                    .build();
+            membreRepo.save(newMembre);
+            return membre;
+        }
     }
 
     @Override
@@ -90,6 +97,25 @@ public class MembreServiceImpl implements MembreService{
             return membreRepo.save(ancienMembre.get());
         }
     }
+
+    @Override
+    public Boolean supprimerMembre(String emailRequester, String emailMembreToDelete) throws NotFoundException, ForbiddenException {
+        Membre requester = getMembreByEmail(emailRequester);
+        if (!requester.getType().equals(EnumTypeUtilisateur.SECRETAIRE.name()) && !requester.getType().equals(EnumTypeUtilisateur.PRESIDENT.name())) {
+            logger.warn("Utilisateur d'email {} ne possède pas le droit pour cette action!", emailRequester);
+            throw new ForbiddenException("Utilisateur d'email " + emailRequester + " ne possède pas le droit pour cette action!");
+        }
+        else {
+            Optional<Membre> membreToDelete = membreRepo.findMembreByMail(emailMembreToDelete);
+            if(membreToDelete.isEmpty()){
+                throw new NotFoundException("L'email "+emailMembreToDelete+"  n'existe pas");
+            }
+            membreRepo.delete(membreToDelete.get());
+            return true;
+        }
+    }
+
+
 
 
 }

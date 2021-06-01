@@ -37,7 +37,7 @@ public class MembreController {
     }
 
     @GetMapping(value = "/{email}")
-    private ResponseEntity<?> getMebreByEmail(@PathVariable("email") String email) {
+    private ResponseEntity<?> getMembreByEmail(@PathVariable("email") String email) {
         try{
             return new ResponseEntity<>(membreService.getMembreByEmail(email), HttpStatus.OK);
         } catch (NotFoundException e){
@@ -53,7 +53,10 @@ public class MembreController {
     public ResponseEntity<?> creerMembre(@RequestBody Membre membre){
         try{
             return ResponseEntity.ok(membreService.creerMembre(membre));
-        }catch (Exception e){
+        }catch (ForbiddenException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+        }
+        catch (Exception e){
             logger.error("Erreur ",e);
             return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -63,6 +66,22 @@ public class MembreController {
     public ResponseEntity<?> mettreAJourMembre(@RequestParam("emailRequester") String emailRequester, @PathVariable("email") String email, @RequestBody Membre membre){
         try{
             return ResponseEntity.ok(membreService.mettreAJourMembre(emailRequester, email, membre));
+        }catch (ForbiddenException e){
+            return new ResponseEntity<>("Utilisateur d'email "+emailRequester+" ne possède pas le droit pour cette action!", HttpStatus.FORBIDDEN);
+        }
+        catch (Exception e){
+            logger.error("Erreur ",e);
+            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping(value = "/delete/{email}")
+    public ResponseEntity<?> supprimerUnMembre(@RequestParam("emailRequester") String emailRequester, @PathVariable("email") String email){
+        try{
+            if(membreService.supprimerMembre(emailRequester, email)){
+                return ResponseEntity.ok("Supression réussie !");
+            }
+            return new ResponseEntity<>("Une erreur est survenue lors de la suppression.",HttpStatus.INTERNAL_SERVER_ERROR);
         }catch (ForbiddenException e){
             return new ResponseEntity<>("Utilisateur d'email "+emailRequester+" ne possède pas le droit pour cette action!", HttpStatus.FORBIDDEN);
         }
