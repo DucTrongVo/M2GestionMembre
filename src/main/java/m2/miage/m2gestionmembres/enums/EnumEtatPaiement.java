@@ -1,7 +1,7 @@
 package m2.miage.m2gestionmembres.enums;
 
 public enum EnumEtatPaiement {
-    EN_ATTEND("En attend de vérification"),
+    EN_ATTENTE("En attente de vérification"),
     REFUSED("Paiement refusé"),
     ACCEPTED("Paiement accepté");
 

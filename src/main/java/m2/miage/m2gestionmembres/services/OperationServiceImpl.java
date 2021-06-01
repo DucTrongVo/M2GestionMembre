@@ -2,7 +2,6 @@ package m2.miage.m2gestionmembres.services;
 
 import javassist.NotFoundException;
 import m2.miage.m2gestionmembres.Exception.ForbiddenException;
-import m2.miage.m2gestionmembres.controllers.MembreController;
 import m2.miage.m2gestionmembres.entities.Membre;
 import m2.miage.m2gestionmembres.entities.Operation;
 import m2.miage.m2gestionmembres.enums.EnumEtatPaiement;
@@ -50,7 +49,7 @@ public class OperationServiceImpl implements OperationService{
 
     @Override
     @Transactional
-    public Operation paiement(String emailMembre, String iban, double montant) throws NotFoundException, ForbiddenException {
+    public Operation creerPaiement(String emailMembre, String iban, double montant) throws NotFoundException, ForbiddenException {
         Optional<Membre> membre = membreRepo.findMembreByMail(emailMembre);
         if (membre.isEmpty()) {
             logger.error("Membre d'email {} introuvable!", emailMembre);
@@ -58,7 +57,7 @@ public class OperationServiceImpl implements OperationService{
         }
         if (rightService.checkRight(membre.get(),EnumTypeUtilisateur.MEMBRE.name())) {
             Operation operation = Operation.builder().membre(membre.get()).iban(iban).montant(montant)
-                .dateVerify(Calendar.getInstance()).status(EnumEtatPaiement.EN_ATTEND.name())
+                .dateVerify(Calendar.getInstance()).status(EnumEtatPaiement.EN_ATTENTE.name())
                 .build();
             return operationRepository.save(operation);
         } else {
@@ -69,7 +68,7 @@ public class OperationServiceImpl implements OperationService{
 
     @Override
     @Transactional
-    public Operation validatePaiement(String emailSec, Integer idOperation) throws NotFoundException, ForbiddenException {
+    public Operation validerPaiement(String emailSec, Integer idOperation) throws NotFoundException, ForbiddenException {
         Operation operation = getOperationById(idOperation);
         Optional<Membre> membre = membreRepo.findMembreByMail(emailSec);
         if (membre.isEmpty()) {
@@ -90,7 +89,7 @@ public class OperationServiceImpl implements OperationService{
 
     @Override
     @Transactional
-    public Operation refusePaiement(String emailSec, Integer idOperation) throws NotFoundException, ForbiddenException {
+    public Operation refuserPaiement(String emailSec, Integer idOperation) throws NotFoundException, ForbiddenException {
         Operation operation = getOperationById(idOperation);
         Optional<Membre> membre = membreRepo.findMembreByMail(emailSec);
         if (membre.isEmpty()) {

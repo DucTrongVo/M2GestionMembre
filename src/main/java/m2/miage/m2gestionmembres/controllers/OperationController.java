@@ -37,26 +37,11 @@ public class OperationController {
         }
     }
 
-    /*@PostMapping("/member/pay")
-    ResponseEntity<Operation> paiement(@RequestParam("emailMembre")String emailMembre, @RequestParam("iban") String iban, @RequestParam("montant") String montant) throws NotFoundException, ForbiddenException, GeneralErreurException {
-        try {
-            double montantInDouble = Double.parseDouble(montant);
-            return new ResponseEntity<>(operationService.paiement(emailMembre, iban, montantInDouble), HttpStatus.OK);
-        } catch (NotFoundException exception) {
-            throw new NotFoundException(exception.getMessage());
-        } catch (ForbiddenException exception) {
-            throw new ForbiddenException(exception.getMessage());
-        } catch (Exception e){
-            logger.error("Erreur ",e);
-            throw new GeneralErreurException();
-        }
-    }*/
-
-    @PostMapping("/validatePayment/{idPayment}")
-    ResponseEntity<Operation> validatePayment(@RequestParam("emailSec") String emailSec, @PathVariable("idPayment") String idOperation) throws NotFoundException, ForbiddenException, GeneralErreurException {
+    @PostMapping("/validerPaiement/{idPaiement}")
+    ResponseEntity<Operation> validatePayment(@RequestParam("emailSec") String emailSec, @PathVariable("idPaiement") String idOperation) throws NotFoundException, ForbiddenException, GeneralErreurException {
         try {
             Integer idOp = Integer.parseInt(idOperation);
-            return new ResponseEntity<>(operationService.validatePaiement(emailSec, idOp), HttpStatus.OK);
+            return new ResponseEntity<>(operationService.validerPaiement(emailSec, idOp), HttpStatus.OK);
         } catch (NotFoundException exception) {
             throw new NotFoundException(exception.getMessage());
         }  catch (ForbiddenException exception) {
@@ -67,11 +52,11 @@ public class OperationController {
         }
     }
 
-    @PostMapping("/refusePayment/{idPayment}")
-    ResponseEntity<Operation> refusePayment(@RequestParam("emailSec") String emailSec, @PathVariable("idPayment") String idOperation) throws NotFoundException, ForbiddenException, GeneralErreurException {
+    @PostMapping("/refuserPaiement/{idPaiement}")
+    ResponseEntity<Operation> refusePayment(@RequestParam("emailSec") String emailSec, @PathVariable("idPaiement") String idOperation) throws NotFoundException, ForbiddenException, GeneralErreurException {
         try {
             Integer idOp = Integer.parseInt(idOperation);
-            return new ResponseEntity<>(operationService.refusePaiement(emailSec, idOp), HttpStatus.OK);
+            return new ResponseEntity<>(operationService.refuserPaiement(emailSec, idOp), HttpStatus.OK);
         } catch (NotFoundException exception) {
             throw new NotFoundException(exception.getMessage());
         }  catch (ForbiddenException exception) {

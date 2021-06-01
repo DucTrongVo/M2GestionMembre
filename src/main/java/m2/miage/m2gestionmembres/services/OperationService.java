@@ -10,9 +10,9 @@ import java.util.List;
 public interface OperationService {
     List<Operation> getAllOperation(String emailSec) throws NotFoundException, ForbiddenException;
     @Transactional
-    Operation paiement(String emailMembre, String iban, double montant) throws NotFoundException, ForbiddenException;
+    Operation creerPaiement(String emailMembre, String iban, double montant) throws NotFoundException, ForbiddenException;
     @Transactional
-    Operation validatePaiement(String emailSec, Integer idOperation) throws NotFoundException, ForbiddenException;
+    Operation validerPaiement(String emailSec, Integer idOperation) throws NotFoundException, ForbiddenException;
     @Transactional
-    Operation refusePaiement(String emailSec, Integer idOperation) throws NotFoundException, ForbiddenException;
+    Operation refuserPaiement(String emailSec, Integer idOperation) throws NotFoundException, ForbiddenException;
 }

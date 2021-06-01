@@ -82,11 +82,11 @@ public class MembreController {
         }
     }
 
-    @PostMapping("/member/pay")
+    @PostMapping("/creerPaiement")
     ResponseEntity<Operation> paiement(@RequestParam("emailMembre")String emailMembre, @RequestParam("iban") String iban, @RequestParam("montant") String montant) throws NotFoundException, ForbiddenException, GeneralErreurException {
         try {
             double montantInDouble = Double.parseDouble(montant);
-            return new ResponseEntity<>(operationService.paiement(emailMembre, iban, montantInDouble), HttpStatus.OK);
+            return new ResponseEntity<>(operationService.creerPaiement(emailMembre, iban, montantInDouble), HttpStatus.OK);
         } catch (NotFoundException exception) {
             throw new NotFoundException(exception.getMessage());
         } catch (ForbiddenException exception) {
