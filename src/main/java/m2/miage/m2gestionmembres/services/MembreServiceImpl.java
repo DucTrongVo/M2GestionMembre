@@ -2,7 +2,6 @@ package m2.miage.m2gestionmembres.services;
 
 import javassist.NotFoundException;
 import m2.miage.m2gestionmembres.Exception.ForbiddenException;
-import m2.miage.m2gestionmembres.controllers.MembreController;
 import m2.miage.m2gestionmembres.entities.Membre;
 import m2.miage.m2gestionmembres.enums.EnumEtatUtilisateur;
 import m2.miage.m2gestionmembres.enums.EnumTypeUtilisateur;
@@ -57,8 +56,7 @@ public class MembreServiceImpl implements MembreService{
     public List<Membre> getAllMembre(String emailRequester) throws NotFoundException, ForbiddenException {
         Membre requester = getMembreByEmail(emailRequester);
         if (requester.getType().equals(EnumTypeUtilisateur.SECRETAIRE.name()) || requester.getType().equals(EnumTypeUtilisateur.PRESIDENT.name())) {
-            List<Membre> allMembre = membreRepo.findAll();
-            return allMembre;
+            return membreRepo.findAll();
         } else {
             logger.warn("Utilisateur d'email {} ne possède pas le droit pour cette action!", emailRequester);
             throw new ForbiddenException("Utilisateur d'email "+emailRequester+" ne possède pas le droit pour cette action!");

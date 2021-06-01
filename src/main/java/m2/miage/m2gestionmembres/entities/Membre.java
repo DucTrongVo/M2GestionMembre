@@ -6,11 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.io.Serializable;
 import java.util.Calendar;
 
 @SuperBuilder
@@ -20,7 +18,9 @@ import java.util.Calendar;
 @Getter
 @Setter
 @Table(name = "membre")
-public class Membre {
+public class Membre implements Serializable {
+
+    private static final long serialVersionUID = -7499754709735547940L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -42,20 +42,35 @@ public class Membre {
     @Column(name = "adresse")
     private String adresse;
 
+    /**
+     * date validité de la derniere certification
+     */
     @Column(name = "dateCertif")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss", timezone = "UTC")
     private Calendar dateCertif;
 
+    /**
+     * niveau de classe
+     */
     @Column(name = "niveau")
     private Integer niveau;
 
+    /**
+     * numé de licence
+     */
     @Column(name = "numLicence")
     private String numLicence;
 
+    /**
+     * Type d'utilisateur
+     */
     @Column(name = "type")
     private String type;
 
+    /**
+     * Etat du paiement
+     */
     @Column(name = "etat")
     private String etat;
 }
