@@ -2,8 +2,11 @@ package m2.miage.m2gestionmembres.controllers;
 
 import javassist.NotFoundException;
 import m2.miage.m2gestionmembres.Exception.ForbiddenException;
+import m2.miage.m2gestionmembres.Exception.GeneralErreurException;
 import m2.miage.m2gestionmembres.entities.Membre;
+import m2.miage.m2gestionmembres.entities.Operation;
 import m2.miage.m2gestionmembres.services.MembreService;
+import m2.miage.m2gestionmembres.services.OperationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,9 @@ public class MembreController {
 
     @Autowired
     private MembreService membreService;
+
+    @Autowired
+    private OperationService operationService;
 
     @GetMapping(value = "/allMembre")
     private ResponseEntity<?> getAllMembre(@RequestParam("emailRequester") String emailRequester) {
@@ -71,6 +77,21 @@ public class MembreController {
         catch (Exception e){
             logger.error("Erreur ",e);
             return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/member/pay")
+    ResponseEntity<Operation> paiement(@RequestParam("emailMembre")String emailMembre, @RequestParam("iban") String iban, @RequestParam("montant") String montant) throws NotFoundException, ForbiddenException, GeneralErreurException {
+        try {
+            double montantInDouble = Double.parseDouble(montant);
+            return new ResponseEntity<>(operationService.paiement(emailMembre, iban, montantInDouble), HttpStatus.OK);
+        } catch (NotFoundException exception) {
+            throw new NotFoundException(exception.getMessage());
+        } catch (ForbiddenException exception) {
+            throw new ForbiddenException(exception.getMessage());
+        } catch (Exception e){
+            logger.error("Erreur ",e);
+            throw new GeneralErreurException();
         }
     }
 

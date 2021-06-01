@@ -2,6 +2,8 @@ package m2.miage.m2gestionmembres.controllers;
 
 import javassist.NotFoundException;
 import m2.miage.m2gestionmembres.Exception.ForbiddenException;
+import m2.miage.m2gestionmembres.Exception.GeneralErreurException;
+import m2.miage.m2gestionmembres.entities.Operation;
 import m2.miage.m2gestionmembres.services.OperationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,7 @@ public class OperationController {
     @Autowired
     private OperationService operationService;
 
-    @GetMapping("/")
+    @GetMapping("/getAll")
     ResponseEntity<?> getAllOperation(@RequestParam("emailSec") String emailSec) throws NotFoundException, ForbiddenException {
         try {
             return new ResponseEntity<>(operationService.getAllOperation(emailSec), HttpStatus.OK);
@@ -33,8 +35,8 @@ public class OperationController {
         }
     }
 
-    @PostMapping("/member/pay")
-    ResponseEntity<?> paiement(@RequestParam("emailMembre")String emailMembre, @RequestParam("iban") String iban, @RequestParam("montant") String montant) throws NotFoundException, ForbiddenException {
+    /*@PostMapping("/member/pay")
+    ResponseEntity<Operation> paiement(@RequestParam("emailMembre")String emailMembre, @RequestParam("iban") String iban, @RequestParam("montant") String montant) throws NotFoundException, ForbiddenException, GeneralErreurException {
         try {
             double montantInDouble = Double.parseDouble(montant);
             return new ResponseEntity<>(operationService.paiement(emailMembre, iban, montantInDouble), HttpStatus.OK);
@@ -44,9 +46,9 @@ public class OperationController {
             throw new ForbiddenException(exception.getMessage());
         } catch (Exception e){
             logger.error("Erreur ",e);
-            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GeneralErreurException();
         }
-    }
+    }*/
 
     @PostMapping("/validatePayment/{idPayment}")
     ResponseEntity<?> validatePayment(@RequestParam("emailSec") String emailSec, @PathVariable("idPayment") String idOperation) throws NotFoundException, ForbiddenException {

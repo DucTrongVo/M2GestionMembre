@@ -42,20 +42,35 @@ public class Membre implements Serializable {
     @Column(name = "adresse")
     private String adresse;
 
+    /**
+     * date validité de la derniere certification
+     */
     @Column(name = "dateCertif")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss", timezone = "UTC")
     private Calendar dateCertif;
 
+    /**
+     * niveau de classe
+     */
     @Column(name = "niveau")
     private Integer niveau;
 
+    /**
+     * numé de licence
+     */
     @Column(name = "numLicence")
     private String numLicence;
 
+    /**
+     * Type d'utilisateur
+     */
     @Column(name = "type")
     private String type;
 
+    /**
+     * Etat du paiement
+     */
     @Column(name = "etat")
     private String etat;
 }
