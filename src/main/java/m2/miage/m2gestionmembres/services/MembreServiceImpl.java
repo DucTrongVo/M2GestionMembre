@@ -28,7 +28,7 @@ public class MembreServiceImpl implements MembreService{
     public Membre creerMembre(Membre membre) throws ForbiddenException {
         String email = membre.getMail();
         Optional<Membre> membreEnBase = membreRepo.findMembreByMail(email);
-        if(!membreEnBase.isEmpty()){
+        if(membreEnBase.isPresent()){
             throw new ForbiddenException("Création impossible : l'email "+email+" est déja utilisé.");
         }
         else {
@@ -74,6 +74,10 @@ public class MembreServiceImpl implements MembreService{
         }
         else{
             Optional<Membre> ancienMembre = membreRepo.findMembreByMail(email);
+            if (ancienMembre.isEmpty()){
+                logger.error("Membre d'email "+email+" introuvable!");
+                throw new NotFoundException("Membre d'email "+email+" introuvable!");
+            }
             if (!StringUtils.isBlank(membreAJour.getEtat())) {
                 ancienMembre.get().setEtat(membreAJour.getEtat());
             }
@@ -88,9 +92,8 @@ public class MembreServiceImpl implements MembreService{
             }
 
             if (membreAJour.getDateCertif() != null) {
-                String dateFormat = "dd-yMM-yyyy HH:mm:ss";
+                //String dateFormat = "dd-yMM-yyyy HH:mm:ss";
                 //LocalDateTime dateString = membreAJour.getDateCertif().format(DateTimeFormatter.ofPattern(dateFormat));
-
                 ancienMembre.get().setDateCertif(membreAJour.getDateCertif());
             }
             return membreRepo.save(ancienMembre.get());
@@ -129,7 +132,7 @@ public class MembreServiceImpl implements MembreService{
         Date dateCertif = calendar.getTime();
         Date today = new Date();
         long difference = today.getTime() - dateCertif.getTime();
-        float nbJours = (difference/ (1000*60*60*24));
+        float nbJours = (float)(difference / (1000*60*60*24));
         return nbJours < 365;
     }
 
