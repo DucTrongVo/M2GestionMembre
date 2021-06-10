@@ -32,6 +32,9 @@ public class OperationServiceImpl implements OperationService{
     @Autowired
     private IRightService rightService;
 
+    @Autowired
+    private MembreService membreService;
+
     @Override
     public List<Operation> getAllOperation(String emailSec) throws NotFoundException, ForbiddenException {
         Optional<Membre> membre = membreRepo.findMembreByMail(emailSec);
@@ -103,6 +106,17 @@ public class OperationServiceImpl implements OperationService{
             logger.warn("Utilisateur d'email {} ne possède pas le droit pour cette action!", emailSec);
             throw new ForbiddenException("Utilisateur d'email "+emailSec+" ne possède pas le droit pour cette action!");
         }
+    }
+
+    @Override
+    public List<Operation> getOperationByMembre(String emailSec, String emailMembre) throws NotFoundException, ForbiddenException {
+        Membre secretaire = membreService.getMembreByEmail(emailSec);
+        if (!EnumTypeUtilisateur.SECRETAIRE.name().equals(secretaire.getType())){
+            logger.error("Seulement les sécrétaires peuvent effectuer cette action (Vous êtes "+secretaire.getType()+"!");
+            throw new ForbiddenException("Seulement les sécrétaires peuvent effectuer cette action (Vous êtes "+secretaire.getType()+"!");
+        }
+
+        return operationRepository.findAllByMembre_Mail(emailMembre);
     }
 
     private Operation getOperationById(Integer idOperation) throws NotFoundException {

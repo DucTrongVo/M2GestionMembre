@@ -12,9 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MembreServiceImpl implements MembreService{
@@ -24,7 +25,7 @@ public class MembreServiceImpl implements MembreService{
     @Autowired
     private MembreRepo membreRepo;
 
-    public Membre creerMembre(Membre membre) throws NotFoundException, ForbiddenException {
+    public Membre creerMembre(Membre membre) throws ForbiddenException {
         String email = membre.getMail();
         Optional<Membre> membreEnBase = membreRepo.findMembreByMail(email);
         if(!membreEnBase.isEmpty()){
@@ -34,7 +35,8 @@ public class MembreServiceImpl implements MembreService{
             Membre newMembre = Membre.builder().nom(membre.getNom()).prenom(membre.getPrenom())
                     .mail(membre.getMail()).mdp(membre.getMdp()).adresse(membre.getAdresse())
                     .type(StringUtils.isBlank(membre.getType()) ? EnumTypeUtilisateur.MEMBRE.name() : membre.getType())
-                    .etat(EnumEtatUtilisateur.RETARD.name())
+                    .etat(EnumEtatUtilisateur.RETARD.name()).niveau(membre.getNiveau() == null ? 1 : membre.getNiveau())
+                    .dateCertif(membre.getDateCertif()).numLicence(membre.getNumLicence())
                     .build();
             membreRepo.save(newMembre);
             return membre;
@@ -116,17 +118,19 @@ public class MembreServiceImpl implements MembreService{
     public Boolean isMembreApte(String emailMembre) throws NotFoundException {
         Optional<Membre> membre = membreRepo.findMembreByMail(emailMembre);
         if(membre.isEmpty()){
-            throw new NotFoundException("L'email "+emailMembre+"  n'existe pas");
+            logger.error("Membre d'email "+emailMembre+" introuvable!");
+            throw new NotFoundException("Membre d'email "+emailMembre+" introuvable!");
         }
         Calendar calendar = membre.get().getDateCertif();
+        if (calendar == null){
+            logger.error("Date certification pas encore transmet!");
+            throw new NotFoundException("Date certification pas encore transmet!");
+        }
         Date dateCertif = calendar.getTime();
         Date today = new Date();
         long difference = today.getTime() - dateCertif.getTime();
         float nbJours = (difference/ (1000*60*60*24));
-        if(nbJours<365){
-            return true;
-        }
-        return false;
+        return nbJours < 365;
     }
 
 

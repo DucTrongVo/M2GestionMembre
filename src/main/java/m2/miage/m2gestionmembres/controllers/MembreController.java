@@ -5,6 +5,7 @@ import m2.miage.m2gestionmembres.Exception.ForbiddenException;
 import m2.miage.m2gestionmembres.Exception.GeneralErreurException;
 import m2.miage.m2gestionmembres.entities.Membre;
 import m2.miage.m2gestionmembres.entities.Operation;
+import m2.miage.m2gestionmembres.entities.dto.Apte;
 import m2.miage.m2gestionmembres.services.MembreService;
 import m2.miage.m2gestionmembres.services.OperationService;
 import org.slf4j.Logger;
@@ -97,6 +98,20 @@ public class MembreController {
         }
     }
 
+    @GetMapping("/getOperations/{emailMembre}")
+    ResponseEntity<List<Operation>> getAllOperationByMembre(@RequestParam("emailSec") String emailSec, @PathVariable("emailMembre") String emailMembre) throws ForbiddenException, NotFoundException, GeneralErreurException {
+        try {
+            return ResponseEntity.ok(operationService.getOperationByMembre(emailSec, emailMembre));
+        } catch (ForbiddenException e) {
+            throw new ForbiddenException(e.getMessage());
+        } catch (NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        } catch (Exception e){
+            logger.error("Une erreur est survenue : ",e);
+            throw new GeneralErreurException();
+        }
+    }
+
     @DeleteMapping(value = "/delete/{email}")
     public ResponseEntity<String> supprimerUnMembre(@RequestParam("emailRequester") String emailRequester, @PathVariable("email") String email) throws ForbiddenException, GeneralErreurException {
         try{
@@ -114,18 +129,18 @@ public class MembreController {
     }
 
     @GetMapping(value = "/isApte/{email}")
-    private ResponseEntity<?> isMembreApte(@PathVariable("email") String email) {
+    private ResponseEntity<Apte> isMembreApte(@PathVariable("email") String email) throws NotFoundException, GeneralErreurException {
         try{
             if(membreService.isMembreApte(email)){
-                return new ResponseEntity<>("Le membre est bien apte ! :)", HttpStatus.OK);
+                Apte apte = new Apte(true, "Le membre est bien apte ! :)");
+                return new ResponseEntity<>(apte, HttpStatus.OK);
             }
-            return new ResponseEntity<>("Le membre est non apte. :(", HttpStatus.OK);
+            return new ResponseEntity<>(new Apte(false, "Le membre est non apte. :("), HttpStatus.OK);
         } catch (NotFoundException e){
-            return new ResponseEntity<>("Membre d'email "+email+" introuvable!", HttpStatus.NOT_FOUND);
-        }
-        catch (Exception e){
+            throw new NotFoundException(e.getMessage());
+        } catch (Exception e){
             logger.error("Erreur ",e);
-            return new ResponseEntity<>("Une erreur est survenue", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new GeneralErreurException();
         }
     }
 }

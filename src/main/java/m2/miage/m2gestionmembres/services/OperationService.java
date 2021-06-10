@@ -15,4 +15,5 @@ public interface OperationService {
     Operation validerPaiement(String emailSec, Integer idOperation) throws NotFoundException, ForbiddenException;
     @Transactional
     Operation refuserPaiement(String emailSec, Integer idOperation) throws NotFoundException, ForbiddenException;
+    List<Operation> getOperationByMembre(String emailSec, String emailMembre) throws NotFoundException, ForbiddenException;
 }

@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface OperationRepository extends CrudRepository<Operation, Integer> {
     Optional<List<Operation>> findAllByMembre(Membre membre);
     List<Operation> findAll();
+    List<Operation> findAllByMembre_Mail(String emailMembre);
 }
