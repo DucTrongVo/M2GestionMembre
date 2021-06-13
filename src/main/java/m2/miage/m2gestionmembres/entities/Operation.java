@@ -51,7 +51,7 @@ public class Operation implements Serializable {
     private String status;
 
     @Column(name = "dateVerify")
-    @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss", timezone = "UTC")
-    private Calendar dateVerify;
+//    @Temporal(TemporalType.TIMESTAMP)
+//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss", timezone = "UTC")
+    private String dateVerify;
 }

@@ -12,8 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +23,9 @@ public class MembreServiceImpl implements MembreService{
 
     @Autowired
     private MembreRepo membreRepo;
+
+    @Autowired
+    IToolService toolService;
 
     public Membre creerMembre(Membre membre) throws ForbiddenException {
         String email = membre.getMail();
@@ -124,16 +126,16 @@ public class MembreServiceImpl implements MembreService{
             logger.error("Membre d'email "+emailMembre+" introuvable!");
             throw new NotFoundException("Membre d'email "+emailMembre+" introuvable!");
         }
-        Calendar calendar = membre.get().getDateCertif();
+        String calendar = membre.get().getDateCertif();
         if (calendar == null){
             logger.error("Date certification pas encore transmet!");
             throw new NotFoundException("Date certification pas encore transmet!");
         }
-        Date dateCertif = calendar.getTime();
-        Date today = new Date();
-        long difference = today.getTime() - dateCertif.getTime();
-        float nbJours = (float)(difference / (1000*60*60*24));
-        return nbJours < 365;
+        LocalDateTime dateCertif = toolService.getDateTimeFromString(calendar);
+        if (dateCertif.isBefore(LocalDateTime.now())){
+            return  (toolService.getDateDifferent(dateCertif, LocalDateTime.now()) < 365);
+        }
+        return (toolService.getDateDifferent(LocalDateTime.now(), dateCertif) < 365);
     }
 
 

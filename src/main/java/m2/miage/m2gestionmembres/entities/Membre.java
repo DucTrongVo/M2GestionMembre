@@ -1,6 +1,5 @@
 package m2.miage.m2gestionmembres.entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +8,6 @@ import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Calendar;
 
 @SuperBuilder
 @Entity
@@ -46,9 +44,9 @@ public class Membre implements Serializable {
      * date validité de la derniere certification
      */
     @Column(name = "dateCertif")
-    @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss", timezone = "UTC")
-    private Calendar dateCertif;
+//    @Temporal(TemporalType.TIMESTAMP)
+//    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss", timezone = "UTC")
+    private String dateCertif;
 
     /**
      * niveau de classe

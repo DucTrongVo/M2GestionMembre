@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +34,9 @@ public class OperationServiceImpl implements OperationService{
 
     @Autowired
     private MembreService membreService;
+
+    @Autowired
+    IToolService toolService;
 
     @Override
     public List<Operation> getAllOperation(String emailSec) throws NotFoundException, ForbiddenException {
@@ -60,7 +63,7 @@ public class OperationServiceImpl implements OperationService{
         }
         if (rightService.checkRight(membre.get(),EnumTypeUtilisateur.MEMBRE.name())) {
             Operation operation = Operation.builder().membre(membre.get()).iban(iban).montant(montant)
-                .dateVerify(Calendar.getInstance()).status(EnumEtatPaiement.EN_ATTENTE.name())
+                .dateVerify(toolService.getStringFromDateTime(LocalDateTime.now())).status(EnumEtatPaiement.EN_ATTENTE.name())
                 .build();
             return operationRepository.save(operation);
         } else {
