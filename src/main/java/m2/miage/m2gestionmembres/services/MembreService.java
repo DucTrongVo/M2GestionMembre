@@ -1,8 +1,9 @@
 package m2.miage.m2gestionmembres.services;
 
-import javassist.NotFoundException;
 import m2.miage.m2gestionmembres.Exception.ForbiddenException;
+import m2.miage.m2gestionmembres.Exception.NotFoundException;
 import m2.miage.m2gestionmembres.entities.Membre;
+import m2.miage.m2gestionmembres.entities.dto.Statistique;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface MembreService {
     @Transactional
     Boolean supprimerMembre(String emailRequester, String emailMembre) throws NotFoundException, ForbiddenException;
     Boolean isMembreApte(String emailMembre) throws NotFoundException;
+
+    Statistique getStatistique(String emailPresident) throws NotFoundException, ForbiddenException;
 }

@@ -1,7 +1,7 @@
 package m2.miage.m2gestionmembres.services;
 
-import javassist.NotFoundException;
 import m2.miage.m2gestionmembres.Exception.ForbiddenException;
+import m2.miage.m2gestionmembres.Exception.NotFoundException;
 import m2.miage.m2gestionmembres.entities.Operation;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -8,4 +8,6 @@ public interface IToolService {
     String getStringFromDateTime(LocalDateTime dateTime);
 
     int getDateDifferent(LocalDateTime dateBefore, LocalDateTime dateAfter);
+
+
 }

@@ -1,8 +1,8 @@
 package m2.miage.m2gestionmembres.controllers;
 
-import javassist.NotFoundException;
 import m2.miage.m2gestionmembres.Exception.ForbiddenException;
 import m2.miage.m2gestionmembres.Exception.GeneralErreurException;
+import m2.miage.m2gestionmembres.Exception.NotFoundException;
 import m2.miage.m2gestionmembres.entities.Operation;
 import m2.miage.m2gestionmembres.services.OperationService;
 import org.slf4j.Logger;

@@ -1,11 +1,15 @@
 package m2.miage.m2gestionmembres.services;
 
-import javassist.NotFoundException;
 import m2.miage.m2gestionmembres.Exception.ForbiddenException;
+import m2.miage.m2gestionmembres.Exception.NotFoundException;
 import m2.miage.m2gestionmembres.entities.Membre;
+import m2.miage.m2gestionmembres.entities.Operation;
+import m2.miage.m2gestionmembres.entities.dto.Statistique;
+import m2.miage.m2gestionmembres.enums.EnumEtatPaiement;
 import m2.miage.m2gestionmembres.enums.EnumEtatUtilisateur;
 import m2.miage.m2gestionmembres.enums.EnumTypeUtilisateur;
 import m2.miage.m2gestionmembres.repositories.MembreRepo;
+import m2.miage.m2gestionmembres.repositories.OperationRepository;
 import org.junit.platform.commons.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +27,12 @@ public class MembreServiceImpl implements MembreService{
 
     @Autowired
     private MembreRepo membreRepo;
+
+    @Autowired
+    private OperationRepository operationRepository;
+
+    @Autowired
+    private IRightService rightService;
 
     @Autowired
     IToolService toolService;
@@ -59,7 +69,7 @@ public class MembreServiceImpl implements MembreService{
     @Override
     public List<Membre> getAllMembre(String emailRequester) throws NotFoundException, ForbiddenException {
         Membre requester = getMembreByEmail(emailRequester);
-        if (requester.getType().equals(EnumTypeUtilisateur.SECRETAIRE.name()) || requester.getType().equals(EnumTypeUtilisateur.PRESIDENT.name())) {
+        if (rightService.checkRight(requester, EnumTypeUtilisateur.SECRETAIRE.name()) || rightService.checkRight(requester, EnumTypeUtilisateur.PRESIDENT.name())) {
             return membreRepo.findAll();
         } else {
             logger.warn("Utilisateur d'email {} ne possède pas le droit pour cette action!", emailRequester);
@@ -70,7 +80,7 @@ public class MembreServiceImpl implements MembreService{
     @Override
     public Membre mettreAJourMembre(String emailRequester, String email, Membre membreAJour) throws NotFoundException, ForbiddenException {
         Membre requester = getMembreByEmail(emailRequester);
-        if (!requester.getType().equals(EnumTypeUtilisateur.SECRETAIRE.name())) {
+        if (!rightService.checkRight(requester, EnumTypeUtilisateur.SECRETAIRE.name())) {
             logger.warn("Utilisateur d'email {} ne possède pas le droit pour cette action!", emailRequester);
             throw new ForbiddenException("Utilisateur d'email " + emailRequester + " ne possède pas le droit pour cette action!");
         }
@@ -105,7 +115,7 @@ public class MembreServiceImpl implements MembreService{
     @Override
     public Boolean supprimerMembre(String emailRequester, String emailMembreToDelete) throws NotFoundException, ForbiddenException {
         Membre requester = getMembreByEmail(emailRequester);
-        if (!requester.getType().equals(EnumTypeUtilisateur.SECRETAIRE.name()) && !requester.getType().equals(EnumTypeUtilisateur.PRESIDENT.name())) {
+        if (!rightService.checkRight(requester, EnumTypeUtilisateur.SECRETAIRE.name()) && !rightService.checkRight(requester, EnumTypeUtilisateur.PRESIDENT.name())) {
             logger.warn("Utilisateur d'email {} ne possède pas le droit pour cette action!", emailRequester);
             throw new ForbiddenException("Utilisateur d'email " + emailRequester + " ne possède pas le droit pour cette action!");
         }
@@ -136,6 +146,39 @@ public class MembreServiceImpl implements MembreService{
             return  (toolService.getDateDifferent(dateCertif, LocalDateTime.now()) < 365);
         }
         return (toolService.getDateDifferent(LocalDateTime.now(), dateCertif) < 365);
+    }
+
+    @Override
+    public Statistique getStatistique(String emailPresident) throws NotFoundException, ForbiddenException {
+        Membre requester = getMembreByEmail(emailPresident);
+        if (!rightService.checkRight(requester, EnumTypeUtilisateur.PRESIDENT.name())){
+            logger.warn("Utilisateur d'email {} ne possède pas le droit pour cette action!", emailPresident);
+            throw new ForbiddenException("Utilisateur d'email " + emailPresident + " ne possède pas le droit pour cette action!");
+        }
+        Statistique statistique = new Statistique();
+        List<Membre> membres = membreRepo.findAll();
+        statistique.setNombreMembres(membres.size());
+        int countEns = 0;
+        for (Membre membre : membres){
+            if (rightService.checkRight(membre, EnumTypeUtilisateur.ENSEIGNANT.name())){
+                countEns += 1;
+            }
+        }
+        statistique.setNombreEnseignants(countEns);
+        List<Operation> operations = operationRepository.findAll();
+        int countPrevu = 0;
+        int countRegle = 0;
+        for (Operation operation : operations){
+            if (EnumEtatPaiement.EN_ATTENTE.name().equals(operation.getStatus())){
+                countPrevu += 1;
+            }
+            if (EnumEtatPaiement.ACCEPTED.name().equals(operation.getStatus())){
+                countRegle += 1;
+            }
+        }
+        statistique.setTotalCotisationPrevues(countPrevu);
+        statistique.setTotalCotisationReglees(countRegle);
+        return statistique;
     }
 
 

@@ -1,11 +1,12 @@
 package m2.miage.m2gestionmembres.controllers;
-
-import javassist.NotFoundException;
+;
 import m2.miage.m2gestionmembres.Exception.ForbiddenException;
 import m2.miage.m2gestionmembres.Exception.GeneralErreurException;
+import m2.miage.m2gestionmembres.Exception.NotFoundException;
 import m2.miage.m2gestionmembres.entities.Membre;
 import m2.miage.m2gestionmembres.entities.Operation;
 import m2.miage.m2gestionmembres.entities.dto.Apte;
+import m2.miage.m2gestionmembres.entities.dto.Statistique;
 import m2.miage.m2gestionmembres.services.MembreService;
 import m2.miage.m2gestionmembres.services.OperationService;
 import org.slf4j.Logger;
@@ -140,6 +141,20 @@ public class MembreController {
             throw new NotFoundException(e.getMessage());
         } catch (Exception e){
             logger.error("Erreur ",e);
+            throw new GeneralErreurException();
+        }
+    }
+
+    @GetMapping(value = "/stat/{emailPresident}")
+    private ResponseEntity<Statistique> getStat(@PathVariable("emailPresident") String emailPresident) throws GeneralErreurException, ForbiddenException, NotFoundException {
+        try {
+            return ResponseEntity.ok(membreService.getStatistique(emailPresident));
+        } catch (ForbiddenException e) {
+            throw new ForbiddenException(e.getMessage());
+        } catch (NotFoundException e) {
+            throw new NotFoundException(e.getMessage());
+        } catch (Exception e){
+            logger.error("Une erreur est survenue : ",e);
             throw new GeneralErreurException();
         }
     }
