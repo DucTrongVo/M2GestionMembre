@@ -51,8 +51,7 @@ public class MembreController {
         } catch (NotFoundException e){
             //return new ResponseEntity<>("Membre d'email "+email+" introuvable!", HttpStatus.NOT_FOUND);
             throw new NotFoundException(e.getMessage());
-        }
-        catch (Exception e){
+        } catch (Exception e){
             logger.error("Erreur ",e);
             throw new GeneralErreurException();
         }
@@ -62,10 +61,9 @@ public class MembreController {
     public ResponseEntity<Membre> creerMembre(@RequestBody Membre membre) throws GeneralErreurException, ForbiddenException {
         try{
             return ResponseEntity.ok(membreService.creerMembre(membre));
-        }catch (ForbiddenException e){
+        } catch (ForbiddenException e){
             throw new ForbiddenException(e.getMessage());
-        }
-        catch (Exception e){
+        } catch (Exception e){
             logger.error("Erreur ",e);
             throw new GeneralErreurException();
         }
@@ -75,10 +73,9 @@ public class MembreController {
     public ResponseEntity<Membre> mettreAJourMembre(@RequestParam("emailRequester") String emailRequester, @PathVariable("email") String email, @RequestBody Membre membre) throws GeneralErreurException, ForbiddenException {
         try{
             return ResponseEntity.ok(membreService.mettreAJourMembre(emailRequester, email, membre));
-        }catch (ForbiddenException e){
+        } catch (ForbiddenException e){
             throw new ForbiddenException(e.getMessage());
-        }
-        catch (Exception e){
+        } catch (Exception e){
             logger.error("Erreur ",e);
             throw new GeneralErreurException();
         }
